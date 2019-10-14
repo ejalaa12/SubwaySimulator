@@ -2,11 +2,13 @@
 // Created by ejalaa on 02/10/2019.
 //
 
+#include <utility>
 #include "simulation/Event.h"
+#include "simulation/Entity.h"
 
-
-Event::Event(std::string pCreator, LocalDateTime pScheduledTime, std::string pDescription) :
-mCreator(pCreator), mScheduledTime(pScheduledTime), mDescription(pDescription) {
+Event::Event(Entity *pCreator, LocalDateTime pScheduledTime, std::string pDescription)
+    : mScheduledTime(pScheduledTime), mCreator(pCreator), mDescription(std::move(pDescription)) {
+  mLogger = Logger::getInstance();
 
 }
 
@@ -44,12 +46,13 @@ const std::string &Event::getDescription() const {
   return mDescription;
 }
 
-const std::string &Event::getCreator() const {
-  return mCreator;
-}
-
 std::ostream &operator<<(std::ostream &pOs, const Event &pEvent) {
   pOs << "mScheduledTime: " << pEvent.mScheduledTime << " mDescription: " << pEvent.mDescription << " mCreator: "
       << pEvent.mCreator;
   return pOs;
 }
+
+Entity *Event::getCreator() const {
+  return mCreator;
+}
+

@@ -7,16 +7,19 @@
 #include <string>
 #include <list>
 #include "utilities/LocalDateTime.h"
-#include "Event.h"
+#include "simulation/Event.h"
 #include "utilities/Random.h"
 #include <algorithm>
 #include <functional>
+#include "utilities/Logger.h"
 
 
 class SimEngine {
 private:
-  inline static std::string CLASS_NAME = "SimEngine";
-  inline static long MAX_LOOPS = 1000000L;
+  static std::string CLASS_NAME;
+  static long MAX_LOOPS;
+
+  Logger* mLogger;
 
   std::list<Event*> mEvents;
   LocalDateTime mStartSimTime, mCurrentSimTime, mEndSimTime;
@@ -32,9 +35,10 @@ public:
 private:
   void simStep();
   bool simHasEnded();
+  template <typename T> static bool PComp(const T * const & a, const T * const & b);
 
 public:
-  const LocalDateTime &getCurrentSimTime() const;
+  const LocalDateTime getCurrentSimTime() const;
 
   int getLoops() const;
 

@@ -17,7 +17,9 @@ set(src_files
     src/simulation/SimEngine.cpp
     src/simulation/Event.cpp
     src/utilities/LocalDateTime.cpp
-    src/utilities/Random.cpp)
+    src/utilities/Random.cpp
+    src/utilities/Logger.cpp
+    )
 
 # Automatically add files
 #file(GLOB src_files "src/*.cpp")

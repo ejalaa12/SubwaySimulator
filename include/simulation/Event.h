@@ -6,23 +6,32 @@
 #define SUBWAYSIMULATOR_EVENT_H
 
 #include <ostream>
+#include "utilities/Logger.h"
 #include "utilities/LocalDateTime.h"
+
+
+class Entity;
 
 class Event {
 
 public:
-  Event(std::string pCreator, LocalDateTime pScheduledTime, std::string pDescription);
+  Event(Entity* pCreator, LocalDateTime pScheduledTime, std::string pDescription);
+
+protected:
+  Entity *mCreator;
+public:
+  Entity *getCreator() const;
 
 protected:
   LocalDateTime mScheduledTime;
-  std::string mDescription, mCreator;
+  std::string mDescription;
+  Logger* mLogger;
 
 public:
+
   const LocalDateTime &getScheduledTime() const;
 
   const std::string &getDescription() const;
-
-  const std::string &getCreator() const;
 
   virtual void doAction() = 0;
 

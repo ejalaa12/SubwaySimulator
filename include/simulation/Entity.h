@@ -5,18 +5,16 @@
 #ifndef SUBWAYSIMULATOR_ENTITY_H
 #define SUBWAYSIMULATOR_ENTITY_H
 
-#include "SimEngine.h"
+#include "simulation/SimEngine.h"
 
 class Entity {
 protected:
-  SimEngine &mSimEngine;
+  SimEngine* mSimEngine;
   std::string mName;
 
 public:
-  Entity(std::string pName, SimEngine &pSimEngine);
+  Entity(std::string pName, SimEngine *pSimEngine);
   virtual void init() = 0;
-
-  const SimEngine &getSimEngine() const;
 
   const std::string &getName() const;
 

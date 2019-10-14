@@ -4,7 +4,11 @@
 
 #include "simulation/SimEngine.h"
 
-const LocalDateTime &SimEngine::getCurrentSimTime() const {
+std::string SimEngine::CLASS_NAME = "SimEngine";
+long SimEngine::MAX_LOOPS  = 1000000L;
+
+
+const LocalDateTime SimEngine::getCurrentSimTime() const {
   return mCurrentSimTime;
 }
 
@@ -19,15 +23,16 @@ const Random &SimEngine::getRandom() const {
 SimEngine::SimEngine(long pSeed, LocalDateTime pStartSimTime, LocalDateTime pEndSimTime) :
     mRandom(pSeed), mStartSimTime(pStartSimTime), mCurrentSimTime(pStartSimTime), mEndSimTime(pEndSimTime){
   this->mLoops = 0;
+  mLogger = Logger::getInstance();
 }
 
 void SimEngine::addEvent(Event *pNewEvent) {
   if (std::find(mEvents.begin(), mEvents.end(), pNewEvent) == mEvents.end()){
-    std::cout << "adding event" << std::endl;   // TODO: create Logger Singleton class
+    mLogger->debug("adding event");
     mEvents.push_back(pNewEvent);
-    mEvents.sort(); // TODO: change sort according to pointer
+    mEvents.sort(PComp<Event>);
   } else{
-    std::cout << "Adding an element that already exists (dismissed)" << std::endl;
+    mLogger->warn("Adding an element that already exists (dismissed)");
   }
 }
 
@@ -35,28 +40,30 @@ void SimEngine::removeEvent(Event *pEvent) {
   if (std::find(mEvents.begin(), mEvents.end(), pEvent) != mEvents.end()){
     mEvents.remove(pEvent);
   } else{
-    std::cout << "Trying to remove and element that exists" << std::endl;
+    mLogger->warn("Trying to remove and element that exists");
   }
 
 }
 
 void SimEngine::loop() {
-  std::cout << "Simulation started!" << std::endl;
+  mLogger->info("Simulation started!");
   while (!(simHasEnded()))
     simStep();
-  std::cout << "Simulation ended !" << std::endl;
-  std::cout << "Simulation had " << mLoops << " loops" << std::endl;
+  mLogger->info("Simulation ended !");
+  std::ostringstream stream;
+  stream << "Simulation had : ";
+  stream << mLoops;
+  mLogger->info(stream.str());
 }
 
 void SimEngine::simStep() {
-  std::cout << "sim step" << std::endl;
+  mLogger->info("sim step");
   // Get First event
   Event* currentEvent = mEvents.front();
   mEvents.pop_front();
   // break if the event is after endSimTime
   if (currentEvent->getScheduledTime() > mEndSimTime)
     return;
-  std::cout << "Current event is" << currentEvent << std::endl;
   // Update simulation time with current event time
   mCurrentSimTime = currentEvent->getScheduledTime();
   // Do the action of this event and get all generated events
@@ -68,4 +75,9 @@ void SimEngine::simStep() {
 
 bool SimEngine::simHasEnded() {
   return mEvents.empty() || mCurrentSimTime >= mEndSimTime || mLoops >= MAX_LOOPS;
+}
+
+template<typename T>
+bool SimEngine::PComp(const T *const &a, const T *const &b) {
+    return *a < *b;
 }

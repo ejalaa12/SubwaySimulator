@@ -6,8 +6,27 @@
 #define SUBWAYSIMULATOR_LOGGER_H
 
 
-class Logger {
+#include <string>
+#include <iostream>
 
+class Logger {
+private:
+    static Logger* instance;
+    Logger();
+    enum LogLevel {
+        DEBUG, INFO, WARN, ERROR
+    };
+
+public:
+    static Logger* getInstance();
+
+private:
+    void log(LogLevel pLevel, std::string pMessage);
+public:
+    void debug(std::string pLog);
+    void info(std::string pLog);
+    void warn(std::string pLog);
+    void error(std::string pLog);
 };
 
 

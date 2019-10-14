@@ -66,26 +66,45 @@ public:
 };
 
 int main() {
-  Dog fox("fox", 12);
-  Dog rex("rex", 2);
-  Dog bob("bob", 4);
-  
+  // Create dogs
+  Dog fox("FOX", 12);
+  Dog rex("REX", 2);
+  Dog bob("BOB", 4);
+
+  // add dog to list
   std::vector<std::reference_wrapper<Dog>> dogs;
   dogs.push_back(fox);
   dogs.push_back(rex);
   dogs.push_back(bob);
-  
-  for (Dog d : dogs) {
-    std::cout << d << std::endl;
-  }
-  std::sort(dogs.begin(), dogs.end(), std::less<Dog>{});
-  std::cout << "---" << std::endl;
-  fox.setName("foxie");
-  dogs[1].get().setName("rexou");
+
+  // Print dogs
+  std::cout << "-----------" << std::endl;
+  std::cout << "Original list" << std::endl;
+  std::cout << "-----------" << std::endl;
   for (Dog d : dogs) {
     std::cout << d << std::endl;
   }
 
+  // Sort list
+  std::cout << "-----------" << std::endl;
+  std::cout << "Sorted list by age" << std::endl;
+  std::cout << "-----------" << std::endl;
+  std::sort(dogs.begin(), dogs.end(), std::less<Dog>{});
+  for (Dog d : dogs) {
+    std::cout << d << std::endl;
+  }
+  // rename dog
+  std::cout << "-----------" << std::endl;
+  std::cout << "Renamed fox -> foxie and rex -> rexou" << std::endl;
+  std::cout << "-----------" << std::endl;
+  fox.setName("foxie");
+  dogs[1].get().setName("rexou");
+
+  for (Dog d : dogs) {
+    std::cout << d << std::endl;
+  }
+
+  // tell owner to rename
   Owner paul(fox);
   std::cout << paul << std::endl;
   paul.renameDog("fux");

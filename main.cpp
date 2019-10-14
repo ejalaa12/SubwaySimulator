@@ -2,41 +2,63 @@
 #include "simulation/SimEngine.h"
 #include "simulation/Entity.h"
 
-
-class RecurrentEvent: public Event{
-private:
-  SimEngine &mSimEngine; // TODO: events needs a reference to the simEngine
+class Person : public Entity {
 public:
-  RecurrentEvent(std::string pCreator, LocalDateTime pScheduledTime, SimEngine &pSimEngine)
-      : Event(std::move(pCreator), pScheduledTime, "recurrent event"), mSimEngine(pSimEngine) {
-  }
-  void doAction(){
-    std::cout << "Action from recurrent event !" << std::endl;
-    LocalDateTime dt = mScheduledTime;
-//    dt::time_duration dur(24, 2, 1);
-//    dt.plus(dur);
-    dt.plus(dt::days(31));
-    mSimEngine.addEvent(new RecurrentEvent("Event Generator 2", dt, mSimEngine));
-  }
+  enum Personality {
+    Outgoing, Introvert, Normal
+  };
+
+  Person(SimEngine *pSimEngine, std::string pName, Personality pPersonality);
+
+  void init();
+
+  void organizeParty() const;
+
+private:
+
+  Personality mPersonality;
 };
 
-class EventGenerator : public Entity{
-private:
-  int mHdt;
-
+class Party : public Event {
 public:
-  EventGenerator(std::string pName, SimEngine &pSimEngine, int pHdt) : Entity(pName, pSimEngine), mHdt(pHdt) {
+  Party(Person pOrganizer, LocalDateTime pScheduledTime);
 
-  }
-  void init(){
-    mSimEngine.addEvent(new RecurrentEvent("Event Generator", LocalDateTime(2019, 3, 8), mSimEngine));
-  }
+  void doAction();
 };
+
+
+Person::Person(SimEngine *pSimEngine, std::string pName, Personality pPersonality)
+    : Entity(pName, pSimEngine), mPersonality(pPersonality) {
+}
+
+void Person::init() {
+  Logger *logger = Logger::getInstance();
+  logger->info("Initialized Person");
+  organizeParty();
+}
+
+void Person::organizeParty() const {
+  dt::days d(2);
+  LocalDateTime nextPartyTime = mSimEngine->getCurrentSimTime();
+  nextPartyTime.plus(d);
+  mSimEngine->addEvent(new Party(*this, nextPartyTime));
+}
+
+
+Party::Party(Person pOrganizer, LocalDateTime pScheduledTime)
+    : Event(&pOrganizer, pScheduledTime, "Party !") {
+
+}
+
+void Party::doAction() {
+  mLogger->info("Party Time !");
+  dynamic_cast<Person *>(mCreator)->organizeParty();
+}
 
 int main() {
   SimEngine simEngine(1, LocalDateTime(2019, 3, 9, 14, 12, 3), LocalDateTime(2020, 3, 8, 15, 13, 12));
-  EventGenerator generator("Hehe", simEngine, 10);
-  generator.init();
+  Person jack(&simEngine, "Jack Doe", Person::Personality::Introvert);
+  jack.init();
   simEngine.loop();
 
   return 0;
